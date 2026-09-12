@@ -1,0 +1,47 @@
+{
+  "name": "ledgercraft-expense-tracker-system---be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:test": "supabase test db"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Juadebfm/LedgerCraft-Expense-Tracker-System---BE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Juadebfm/LedgerCraft-Expense-Tracker-System---BE/issues"
+  },
+  "homepage": "https://github.com/Juadebfm/LedgerCraft-Expense-Tracker-System---BE#readme",
+  "dependencies": {
+    "@fastify/cors": "^11.3.0",
+    "@supabase/supabase-js": "^2.116.0",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.12.4",
+    "zod": "^4.6.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "supabase": "^2.117.0",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}
