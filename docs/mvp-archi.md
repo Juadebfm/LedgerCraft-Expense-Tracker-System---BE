@@ -1,5 +1,7 @@
 # LedgerCraft MVP: Product and Architecture Guide
 
+> **Implementation status:** This document describes the intended product and architecture. It is not a list of implemented code. Use [Current codebase map](10-codebase-map.md) and [Current API map](12-current-api-map.md) to determine what exists today.
+
 > **Status:** Product decisions through 9 September 2026.
 >
 > **Audience:** Anybody learning how product decisions become system design, a Node.js + TypeScript API, and a secure PostgreSQL data model.

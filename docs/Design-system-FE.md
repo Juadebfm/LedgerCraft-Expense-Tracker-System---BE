@@ -1,4 +1,6 @@
 # LedgerCraft Design Tokens & Figma Implementation Specs
+
+> **Implementation status:** This is a frontend design reference. No frontend source code exists in this repository, and these tokens do not create backend behaviour.
 **Design System Version:** 1.0.0 (`Precision Ledger`)  
 **Target Platform:** Desktop Web (1440px / 1280px Grid)  
 **Primary Color Seed:** `#0d9488` (Teal 600)  
