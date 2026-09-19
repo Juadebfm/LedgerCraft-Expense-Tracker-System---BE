@@ -1,32 +1,7 @@
-# Things to do when starting this project or any other project
+# Implementation checklist
 
-1. Initialize Node JS:
+Use [Current codebase map](10-codebase-map.md) for the exact current state and [Product roadmap](14-product-roadmap.md) for the ordered implementation stages.
 
-```bash
-npm init -y
-```
+The completed foundation items are environment validation, package configuration, strict TypeScript configuration, the application error type, bearer-token parsing, shared type declarations, and a health-route definition.
 
-2. Install neccesary frameworks and deps:
-
-```bash
-npm i fastify @fastify/cors @supabase/supabase-js dotenv zod
-```
-
-3. Install dev dependencies:
-
-```bash
-npm i --save-dev typescript tsx vitest @types/node supabase
-```
-
-4. Create config files e.g tsconfig.json, .gitignore, .env.example.
-5. Create src/ and src/config/env.ts
-6. Create src/routes/health.ts.
-7. Create src/app.ts, src/server.ts, and src/app.test.ts
-8. Create the routes you need, we start with the authentication
-9. Run:
-
-```bash
-npm run typecheck
-npm test
-npm run build
-```
+**Will be implemented soon after the current checkpoint:** application foundation will export and register the health route, assemble Fastify in `src/app.ts`, start the process from `src/server.ts`, and add a real `app.inject()` test.
