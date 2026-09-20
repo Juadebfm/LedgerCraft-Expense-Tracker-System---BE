@@ -1,4 +1,4 @@
-import { AppError } from "../lib/app-error.js";
+import { AppError } from "../../lib/app-error.js";
 
 export function getBearerToken(
   authorizationHeader: string | undefined,

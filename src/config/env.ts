@@ -9,7 +9,7 @@ const environmentSchema = z.object({
   AUTH_REDIRECT_URL: z.string().url().optional(),
   SUPABASE_URL: z.string().url().optional(),
   SUPABASE_PUBLISHABLE_KEY: z.string().min(1).optional(),
-  SUPABASE_SECRET: z.string().min(1).optional(),
+  SUPABASE_SECRET_KEY: z.string().min(1).optional(),
   EXCHANGE_RATE_API_KEY: z.string().min(1).optional(),
 });
 
