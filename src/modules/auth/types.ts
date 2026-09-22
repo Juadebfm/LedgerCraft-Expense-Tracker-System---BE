@@ -1,5 +1,4 @@
 export type CurrencyCode = "NGN" | "USD";
-export type WorkspaceId = string;
 export type WorkspaceRole = "admin" | "member";
 
 export interface AuthenticatedUser {
@@ -46,15 +45,15 @@ export interface WorkspaceSummary {
   id: string;
   name: string;
   slug: string;
-  type: "personal" | "organization";
+  type: "personal" | "organisation";
   reportingCurrency: CurrencyCode;
   role: WorkspaceRole;
 }
 
-export interface CreateOrganizationWorkspaceInput {
+export interface CreateOrganisationWorkspaceInput {
   name: string;
   slug: string;
-  reportCurrency: CurrencyCode;
+  reportingCurrency: CurrencyCode;
 }
 
 export interface WorkspaceMember {
@@ -77,16 +76,15 @@ export interface InviteWorkspaceMemberInput {
   role: WorkspaceRole;
 }
 
-export interface UpdateWorkspaceMemberInput {
+export interface UpdateWorkspaceMemberRoleInput {
   workspaceId: string;
-  email: string;
+  profileId: string;
   role: WorkspaceRole;
 }
 
 export interface RemoveWorkspaceMemberInput {
   workspaceId: string;
-  email: string;
-  role: WorkspaceRole;
+  profileId: string;
 }
 
 export interface CurrentUser {
@@ -99,44 +97,27 @@ export interface AuthGateway {
   signUp(
     input: SignUpInput,
   ): Promise<{ user: AuthenticatedUser | null; session: AuthSession | null }>;
-  signIn(input: SignInInput): Promise<AuthSession | null>;
-  requestPasswordRecovery(input: {
-    email: string;
-    redirectTo?: string;
-  }): Promise<void>;
-  authenticate(input: {
-    accessToken: string;
-  }): Promise<AuthenticatedUser | null>;
-  signOut(input: { accessToken: string }): Promise<void>;
-  updatePassword(input: {
-    accessToken: string;
-    password: string;
-  }): Promise<AuthenticatedUser>;
-  getCurrentUser(input: { accessToken: string }): Promise<CurrentUser | null>;
-  updateProfile(
-    input: { accessToken: string } & ProfileUpdateInput,
-  ): Promise<Profile>;
-  createOrganizationWorkspace(input: {
-    accessToken: string;
-    name: string;
-    reportingCurrency: CurrencyCode;
-  }): Promise<WorkspaceSummary>;
-  listWorkspaceMembers(input: {
-    accessToken: string;
-    workspaceId: WorkspaceId;
-  }): Promise<WorkspaceMember[]>;
-  addWorkspaceMember(
-    input: { accessToken: string } & AddWorkspaceMemberInput,
-  ): Promise<WorkspaceMember>;
-  updateWorkspaceMember(input: {
-    accessToken: string;
-    workspaceId: WorkspaceId;
-    profileId: string;
-    role: WorkspaceRole;
-  }): Promise<WorkspaceMember>;
-  removeWorkspaceMember(input: {
-    accessToken: string;
-    workspaceId: WorkspaceId;
-    profileId: string;
-  }): Promise<void>;
+  signIn(input: SignInInput): Promise<AuthSession>;
+  requestPasswordRecovery(email: string): Promise<void>;
+  signOut(accessToken: string): Promise<void>;
+  updatePassword(accessToken: string, password: string): Promise<void>;
+  getCurrentUser(accessToken: string): Promise<CurrentUser>;
+  updateProfile(accessToken: string, input: ProfileUpdateInput): Promise<Profile>;
+  uploadAvatar(accessToken: string, avatar: AvatarUpload): Promise<Profile>;
+  softDeleteCurrentUser(accessToken: string): Promise<void>;
+  createOrganisationWorkspace(
+    accessToken: string,
+    input: CreateOrganisationWorkspaceInput,
+  ): Promise<WorkspaceSummary>;
+  listWorkspaceMembers(accessToken: string, workspaceId: string): Promise<WorkspaceMember[]>;
+  addWorkspaceMember(accessToken: string, input: AddWorkspaceMemberInput): Promise<void>;
+  inviteWorkspaceMember(
+    accessToken: string,
+    input: InviteWorkspaceMemberInput,
+  ): Promise<AuthenticatedUser>;
+  setWorkspaceMemberRole(
+    accessToken: string,
+    input: UpdateWorkspaceMemberRoleInput,
+  ): Promise<void>;
+  removeWorkspaceMember(accessToken: string, input: RemoveWorkspaceMemberInput): Promise<void>;
 }
