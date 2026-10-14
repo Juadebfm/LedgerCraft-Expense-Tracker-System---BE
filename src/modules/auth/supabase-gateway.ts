@@ -15,7 +15,6 @@ import type {
 } from "./types.js";
 
 // Reads the publishable Supabase configuration or reports a safe service error.
-
 function requireSupabaseConfig(): { url: string; publishableKey: string } {
   if (!env.SUPABASE_URL || !env.SUPABASE_PUBLISHABLE_KEY) {
     throw new AppError(
@@ -47,7 +46,6 @@ function requireSupabaseAdminConfig(): { url: string; secretKey: string } {
 }
 
 // Creates a stateless client for public Supabase Auth operations.
-
 function createPublicClient(): SupabaseClient {
   const { url, publishableKey } = requireSupabaseConfig();
 
@@ -87,7 +85,7 @@ function createAdminClient(): SupabaseClient {
   });
 }
 
-// Calls a Supabase Auth endpoint with the caller's bearer token and maps failures.
+// Calls a Supabase Auth endpoint with the clients's bearer token and maps failures.
 async function callAuthenticatedAuthEndpoint(
   accessToken: string,
   path: string,
@@ -134,7 +132,6 @@ async function callAuthenticatedAuthEndpoint(
 }
 
 // Maps a Supabase Auth user to the API's user shape.
-
 function toAuthenticatedUser(user: {
   id: string;
   email?: string | null;
