@@ -7,7 +7,7 @@ import { getBearerToken } from "../modules/auth/bearer-token.js";
 import type { AuthGateway } from "../modules/auth/types.js";
 import { request } from "http";
 
-// Write schema for email as a blueprijnt for how info is stored on the db
+// Write schema for email as a blueprint for how info is stored on the db
 
 const emailSchema = z
   .string()
