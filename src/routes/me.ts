@@ -9,7 +9,6 @@ import type {
   AvatarUpload,
   ProfileUpdateInput,
 } from "../modules/auth/types.js";
-import { request } from "http";
 
 const avatarFileSizeLimit = 2 * 1024 * 1024;
 const avatarContentTypes = ["image/jpeg", "image/png", "image/webp"] as const;
@@ -102,7 +101,6 @@ export function createMeRoutes(authGateway: AuthGateway): FastifyPluginAsync {
     // Upload/change avatar
     app.put("/v1/me/avatar", async (request) => {
       const accessToken = getBearerToken(request.headers.authorization);
-      // Comback to check if file is still underlined
       const file = await request.file({
         limits: {
           files: 1,

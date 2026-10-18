@@ -5,7 +5,6 @@ import { z } from "zod";
 import { securityPolicy } from "../config/security.js";
 import { getBearerToken } from "../modules/auth/bearer-token.js";
 import type { AuthGateway } from "../modules/auth/types.js";
-import { request } from "http";
 
 // Write schema for email as a blueprint for how info is stored on the db
 
@@ -69,7 +68,7 @@ export function createAuthRoutes(authGateway: AuthGateway): FastifyPluginAsync {
         return reply.code(201).send({
           user: result.user,
           session: result.session ? serializeSession(result.session) : null,
-          requireEmailConfirmation: result.session === null,
+          requiresEmailConfirmation: result.session === null,
         });
       },
     );
@@ -78,7 +77,7 @@ export function createAuthRoutes(authGateway: AuthGateway): FastifyPluginAsync {
       "/v1/auth/sign-in",
       {
         config: {
-          rateLimit: securityPolicy.signUp,
+          rateLimit: securityPolicy.authentication,
         },
       },
       async (request, reply) => {
@@ -91,7 +90,7 @@ export function createAuthRoutes(authGateway: AuthGateway): FastifyPluginAsync {
     // Signout
     app.post("/v1/auth/sign-out", async (request, reply) => {
       const accessToken = getBearerToken(request.headers.authorization);
-      authGateway.signOut(accessToken);
+      await authGateway.signOut(accessToken);
       return reply.code(204).send();
     });
     // Password Recovery / Forgot password
@@ -99,7 +98,7 @@ export function createAuthRoutes(authGateway: AuthGateway): FastifyPluginAsync {
       "/v1/auth/password-recovery",
       {
         config: {
-          rateLimit: securityPolicy.signUp,
+          rateLimit: securityPolicy.authentication,
         },
       },
       async (request, reply) => {
@@ -109,7 +108,7 @@ export function createAuthRoutes(authGateway: AuthGateway): FastifyPluginAsync {
         // Do not disclose whether an email is registered or not for sec reasons
         return reply.code(202).send({
           message:
-            "If an account exists for that email address, rocovery instructions have been sent",
+            "If an account exists for that email address, recovery instructions have been sent",
         });
       },
     );
