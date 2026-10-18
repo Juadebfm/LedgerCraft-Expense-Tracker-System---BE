@@ -16,7 +16,8 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "db:reset": "supabase db reset",
-    "db:test": "supabase test db"
+    "db:test": "supabase test db",
+    "db:migrate": "supabase db push --linked"
   },
   "repository": {
     "type": "git",
