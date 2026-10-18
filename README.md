@@ -4,9 +4,9 @@ LedgerCraft is a Node.js and TypeScript backend for a personal and organisation 
 
 ## Current status
 
-The project foundation exists, but no HTTP application is assembled yet. The health-route definition, environment validation, application-error type, bearer-token parser, and shared domain types are present. The application entry point, server entry point, authentication routes, and tests will be implemented next.
+The HTTP application and server entry point exist. Authentication, profile, and workspace routes are registered in `src/register.routes.ts`. The root-level [OpenAPI file](openapi.json) documents the authentication routes that are available now.
 
-Read [Start here](docs/00-start-here.md) before running or changing code. [Current codebase map](docs/10-codebase-map.md) is the source of truth for what currently exists.
+Read [Start here](docs/00-start-here.md) for the background concepts; use the API specification alongside the route code for the current auth contract.
 
 ## Commands
 
@@ -14,11 +14,12 @@ Read [Start here](docs/00-start-here.md) before running or changing code. [Curre
 npm ci
 npm run typecheck
 npm run build
+npm run dev
 ```
 
-`npm test` is configured but currently fails because `src/app.test.ts` contains no test suite. Do not interpret a passing build as proof that an API server is running; `src/app.ts` and `src/server.ts` do not contain application code yet.
+Copy `.env.example` to `.env` and fill in the required values before starting the server. Do not commit `.env` or put Supabase keys into Postman requests.
 
-Later checkpoints will add these local-database commands:
+Local-database commands:
 
 ```bash
 npm run supabase:start
@@ -28,6 +29,15 @@ npm run supabase:stop
 ```
 
 `db:reset` will recreate the local database. It must never be used against a database containing data that needs to be kept.
+
+## Try authentication in Postman
+
+1. Start the backend with `npm run dev`.
+2. In Postman, choose **Import** and select the root-level `openapi.json` file.
+3. The imported requests use `http://localhost:3000` by default. Change the base URL if your `PORT` is different.
+4. Start with **Sign up** or **Sign in**. For **Sign out** and **Update password**, set Bearer Token authorization to the `session.accessToken` returned by sign-in.
+
+Sign-up and password recovery can send real emails. Use an address you control for manual testing. A `204` response has no body; Postman should not expect JSON from sign-out or password update.
 
 ## Documentation map
 

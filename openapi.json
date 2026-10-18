@@ -1,0 +1,276 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "LedgerCraft Auth API",
+    "version": "1.0.0",
+    "description": "The authentication endpoints currently implemented in src/routes/auth.ts. Import this file into Postman to try them against a running backend."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local backend (change this URL if PORT or the deployment URL differs)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Create a user, obtain a session, and manage authentication."
+    }
+  ],
+  "paths": {
+    "/v1/auth/sign-up": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign up",
+        "description": "Creates a Supabase Auth user. A database trigger creates the user's profile, personal workspace, and admin membership. The session is null if Supabase does not return one; in that case, the response sets requiresEmailConfirmation to true.",
+        "operationId": "signUp",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "fullName"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "maxLength": 320 },
+                  "password": { "type": "string", "minLength": 8, "maxLength": 128, "format": "password" },
+                  "fullName": { "type": "string", "minLength": 1, "maxLength": 120 },
+                  "reportingCurrency": { "$ref": "#/components/schemas/ReportingCurrency" }
+                }
+              },
+              "example": {
+                "email": "person@example.com",
+                "password": "replace-with-your-own-password",
+                "fullName": "Example Person",
+                "reportingCurrency": "NGN"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sign-up request succeeded. A session may be absent until email confirmation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["user", "session", "requiresEmailConfirmation"],
+                  "properties": {
+                    "user": {
+                      "nullable": true,
+                      "allOf": [{ "$ref": "#/components/schemas/AuthenticatedUser" }]
+                    },
+                    "session": {
+                      "nullable": true,
+                      "allOf": [{ "$ref": "#/components/schemas/Session" }]
+                    },
+                    "requiresEmailConfirmation": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "default": { "$ref": "#/components/responses/ApiError" }
+        }
+      }
+    },
+    "/v1/auth/sign-in": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign in",
+        "description": "Exchanges an email and password for a session. Use session.accessToken as the Bearer token for protected endpoints.",
+        "operationId": "signIn",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "maxLength": 320 },
+                  "password": { "type": "string", "minLength": 8, "maxLength": 128, "format": "password" }
+                }
+              },
+              "example": {
+                "email": "person@example.com",
+                "password": "replace-with-your-own-password"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Signed in.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["session"],
+                  "properties": {
+                    "session": { "$ref": "#/components/schemas/Session" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "default": { "$ref": "#/components/responses/ApiError" }
+        }
+      }
+    },
+    "/v1/auth/sign-out": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign out",
+        "description": "Revokes the session identified by the Bearer access token.",
+        "operationId": "signOut",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Signed out; no response body." },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "default": { "$ref": "#/components/responses/ApiError" }
+        }
+      }
+    },
+    "/v1/auth/password-recovery": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Request password recovery",
+        "description": "Requests a recovery email. The response intentionally does not disclose whether the email is registered.",
+        "operationId": "requestPasswordRecovery",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "maxLength": 320 }
+                }
+              },
+              "example": { "email": "person@example.com" }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Request accepted, regardless of whether the address is registered.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["message"],
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                },
+                "example": {
+                  "message": "If an account exists for that email address, recovery instructions have been sent"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "default": { "$ref": "#/components/responses/ApiError" }
+        }
+      }
+    },
+    "/v1/auth/password": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Update password",
+        "description": "Changes the password for the user identified by the Bearer access token. A recovery flow must supply a valid access token before calling this endpoint.",
+        "operationId": "updatePassword",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["password"],
+                "properties": {
+                  "password": { "type": "string", "minLength": 8, "maxLength": 128, "format": "password" }
+                }
+              },
+              "example": { "password": "replace-with-a-new-password" }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Password updated; no response body." },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "default": { "$ref": "#/components/responses/ApiError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Paste the accessToken returned by sign-in."
+      }
+    },
+    "schemas": {
+      "ReportingCurrency": {
+        "type": "string",
+        "enum": ["NGN", "USD"],
+        "default": "NGN"
+      },
+      "AuthenticatedUser": {
+        "type": "object",
+        "required": ["id", "email"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email", "nullable": true }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "required": ["accessToken", "refreshToken", "expiresAt", "tokenType"],
+        "properties": {
+          "accessToken": { "type": "string" },
+          "refreshToken": { "type": "string" },
+          "expiresAt": { "type": "integer", "nullable": true, "description": "Unix timestamp in seconds, or null when Supabase did not return one." },
+          "tokenType": { "type": "string" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" },
+              "details": { "type": "array", "items": { "type": "object" }, "description": "Present for request-body validation errors." }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request body or an error returned by the authentication provider.",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "Unauthorized": {
+        "description": "Missing or invalid Bearer access token.",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "ApiError": {
+        "description": "Another application or authentication-provider error; status and code depend on the failure.",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      }
+    }
+  }
+}
